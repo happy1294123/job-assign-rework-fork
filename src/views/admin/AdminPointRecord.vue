@@ -4,9 +4,39 @@
       <div class="pt-3 text-dark main">
         <div class="mb-2">
           <div class="card">
-            <h5 class="card-header">登入查詢</h5>
+            <h5 class="card-header">員工查詢</h5>
             <div class="card-body">
               <form @submit.prevent.stop="fetchMembers">
+                <div class="form-group row mb-2">
+                  <span class="col-form-label col-auto">查詢時間</span>
+                  <div class="input-group col-9">
+                    <button
+                      class="btn btn-secondary mr-3"
+                      @click.prevent="handleToday"
+                    >今日</button>
+                    <button
+                      class="btn btn-secondary mr-3"
+                      @click.prevent="handleYesterday"
+                    >昨日</button>
+                    <button
+                      class="btn btn-secondary mr-3"
+                      @click.prevent="handleThisWeek"
+                    >本週</button>
+                    <button
+                      class="btn btn-secondary mr-3"
+                      @click.prevent="handleLastWeek"
+                    >上週</button>
+                    <button
+                      class="btn btn-secondary mr-3"
+                      @click.prevent="handleThisMonth"
+                    >本月</button>
+                    <button
+                      class="btn btn-secondary mr-3"
+                      @click.prevent="handleLastMonth"
+                    >上月</button>
+                  </div>
+                </div>
+
                 <div class="form-group row mb-2">
                   <span class="col-form-label col-auto">日期區間</span>
                   <div class="input-group col-9">
@@ -213,7 +243,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import Layout from '../../components/admin/Layout.vue'
 import fetchWithToken from '@utils/fetchFn.js'
 import { formatDate, formatTime } from '@utils/formatDateTime'
-import { formatISO } from 'date-fns'
+import { formatISO, endOfYesterday, startOfYesterday, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
 
 const filterDetail = reactive({
   startDate: formatISO(new Date()).slice(0, 10) + 'T00:00',
@@ -297,4 +327,47 @@ onMounted(() => {
   fetchGroupOptions()
   fetchMembers()
 })
+
+
+const handleToday = () => {
+  filterDetail.startDate = formatISO(new Date()).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(new Date()).slice(0, 10) + 'T23:59'
+}
+
+const handleYesterday = () => {
+  filterDetail.startDate = formatISO(startOfYesterday()).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfYesterday()).slice(0, 10) + 'T23:59'
+}
+
+const handleThisWeek = () => {
+  filterDetail.startDate = formatISO(startOfWeek(new Date())).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfWeek(new Date())).slice(0, 10) + 'T23:59'
+}
+
+const handleLastWeek = () => {
+  const now = new Date()
+  const lastWeek = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - 7
+  )
+  filterDetail.startDate = formatISO(startOfWeek(lastWeek)).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfWeek(lastWeek)).slice(0, 10) + 'T23:59'
+}
+
+const handleThisMonth = () => {
+  filterDetail.startDate = formatISO(startOfMonth(new Date())).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfMonth(new Date())).slice(0, 10) + 'T23:59'
+}
+
+const handleLastMonth = () => {
+  const now = new Date()
+  const lastMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() - 1,
+    now.getDate()
+  )
+  filterDetail.startDate = formatISO(startOfMonth(lastMonth)).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfMonth(lastMonth)).slice(0, 10) + 'T23:59'
+}
 </script>

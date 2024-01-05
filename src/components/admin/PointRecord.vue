@@ -195,9 +195,9 @@ const filterDetail = reactive({
 const filterPointLogInPeriod = () => {
   emit('filterPointLogInPeriod', { ...filterDetail })
 }
-onMounted(filterPointLogInPeriod)
 const pagination = inject('pagination')
 watch(() => [pagination.page, pagination.pageSize], filterPointLogInPeriod)
+onMounted(filterPointLogInPeriod)
 
 const handleToday = () => {
   filterDetail.startDate = formatISO(new Date()).slice(0, 10) + 'T00:00'
