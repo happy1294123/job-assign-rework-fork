@@ -72,6 +72,7 @@
           <CustomButton
             text="登入"
             class="w-[160px]"
+            :isLoading="isLoading"
           />
         </div>
         <span
@@ -86,6 +87,7 @@
 
 <script setup>
 import fetchWithToken, { fetchWithoutToken } from '@utils/fetchFn'
+import { ref } from 'vue'
 
 const fieldGroupClass = 'flex flex-col mt-8 justify-center'
 const inputClass = 'border rounded-md w-[330px] outline-primary h-10 px-2 mt-2'
@@ -103,8 +105,10 @@ const error = reactive({
   returnError: ''
 })
 
+const isLoading = ref(false)
 const router = useRouter()
 const handleSubmit = async () => {
+  isLoading.value = true
   if (!formData.username) {
     error.username = '帳號不能為空'
   }
@@ -115,6 +119,7 @@ const handleSubmit = async () => {
     error.captcha = '驗證碼錯誤'
   }
   if (error.username || error.password || error.captcha) {
+    isLoading.value = false
     return
   }
   document.getElementById('captcha').value = ''
@@ -127,16 +132,14 @@ const handleSubmit = async () => {
 
   if (data?.error?.status === 400 && data.error.message === 'Invalid identifier or password') {
     error.returnError = '帳號或密碼錯誤'
+    isLoading.value = false
     return
   }
 
   if (data.user.isAdmin) {
     error.returnError = '帳號或密碼錯誤'
+    isLoading.value = false
     return
-    // localStorage.setItem('token', data.jwt)
-    // // router.replace('/admin')
-    // location.href = '/admin'
-    // return
   }
 
   if (data.user.id) {
@@ -144,12 +147,13 @@ const handleSubmit = async () => {
     router.replace('/')
     createLoginLog(data.user.id)
   }
+  isLoading.value = false
 }
 
 const createLoginLog = async (userId) => {
   const response = await fetch('https://api.ipify.org?format=json')
   const ipData = await response.json()
-  const data = await fetchWithToken('/api/login-logs', 'POST', {
+  await fetchWithToken('/api/login-logs', 'POST', {
     data: {
       ip: ipData.ip,
       device: /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
@@ -157,7 +161,6 @@ const createLoginLog = async (userId) => {
       users: userId
     }
   })
-  console.log(data)
 }
 
 onMounted(() => {

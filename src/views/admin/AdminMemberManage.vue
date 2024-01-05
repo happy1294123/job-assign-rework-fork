@@ -73,55 +73,63 @@
           </button>
         </div>
 
-        <!-- <div>
-          <div class="flex text-dark p-2">
-            共
-            <span>
-              {{ pagination.allCount }}
-            </span>
-            筆資料，總頁數
-            <span>
-              {{ pagination.page }}
-            </span>
-            頁 每頁筆數:
-            <div>
-              <select v-model="pagination.pageSize" name="itemsCount">
-                <option value="10" selected>
-                  10
-                </option>
-              </select>
-            </div>
-            目前第:
-            <div>
-              <select name="chosenPage">
-                <option v-for="page in pagination.page" :key="page" :value="page">
-                  {{ page }}
-                </option>
-              </select>
-            </div>
-            頁
-          </div>
-        </div> -->
-
+        <AdminPagination
+          :page="pagination.page"
+          :pageSize="pagination.pageSize"
+          :pageCount="pagination.pageCount"
+          :total="pagination.total"
+          @changePage="(newPage) => pagination.page = newPage"
+          @changePageSize="(newPageSize) => pagination.pageSize = newPageSize"
+        />
         <div class="table-box">
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">編號</th>
-                <th scope="col">員工帳號</th>
-                <th scope="col">姓名</th>
-                <th scope="col">電話</th>
-                <th scope="col">群組</th>
-                <th scope="col">主錢包餘額</th>
-                <th scope="col">註冊日期</th>
-                <th scope="col">最近登入IP</th>
-                <th scope="col">備註</th>
-                <th scope="col">功能</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >編號</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >員工帳號</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >姓名</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >電話</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >群組</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >主錢包餘額</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >註冊日期</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >最近登入IP</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >備註</th>
+                <th
+                  scope="col"
+                  class="text-nowrap"
+                >功能</th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="member in members"
+                v-for="member in sliceMembers"
                 :key="member.id"
               >
                 <th scope="row">
@@ -160,13 +168,13 @@
                 <td>
                   {{ member?.login_logs?.[0]?.ip }}
                 </td>
-                <td>
+                <td class="text-nowrap">
                   {{ member.note }}
                 </td>
                 <td class="flex gap-2">
                   <router-link
                     :to="{ name: 'AdminMember', params: { memberId: member.id } }"
-                    class="btn btn-primary"
+                    class="btn btn-primary text-nowrap"
                   >
                     修改
                   </router-link>
@@ -184,7 +192,7 @@
 import Layout from '../../components/admin/Layout.vue'
 import Modal from '../../components/admin/Modal.vue'
 import CreateMemberForm from '../../components/admin/form/CreateMemberForm.vue'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import getFilterQuery from '@utils/getFilterQuery'
 import fetchWithToken, { fetchWithoutToken } from '@utils/fetchFn'
 import { formatDate, formatTime } from '@utils/formatDateTime'
@@ -195,11 +203,10 @@ const $toast = useToast()
 const members = ref([])
 const groupOptions = ref([])
 const createMemberModal = ref(null)
-const pagination = reactive({
-  page: 1,
-  pageSize: 10,
-  allCount: 0
-})
+
+const pagination = inject('pagination')
+const sliceMembers = computed(() => members.value.slice(pagination.pageSize * (pagination.page - 1), pagination.page * pagination.pageSize))
+
 const filterDetail = reactive({
   info: '',
   group: 0,
@@ -210,7 +217,8 @@ onMounted(async () => {
   const { data } = await fetchWithToken('/api/groups?fields[0]=name&fields[1]=isDefault')
   groupOptions.value = data.map((group) => ({
     id: group.id,
-    name: group.attributes.name
+    name: group.attributes.name,
+    isDefault: group.attributes.isDefault,
   }))
 })
 
@@ -241,12 +249,14 @@ const queryString = qs.stringify({
 })
 
 const fetchMembers = async (query) => {
-  const { filterQuery, countFilterQuery } = getFilterQuery(query)
-  pagination.allCount = await fetchWithToken(`/api/users/count?${countFilterQuery}`)
+  const { filterQuery } = getFilterQuery(query)
+  // pagination.total = await fetchWithToken(`/api/users/count?${countFilterQuery}`)
   members.value = await fetchWithToken(`/api/users?${queryString}${filterQuery}`)
+  pagination.total = members.value.length
 }
-
-fetchMembers(route.query)
+onMounted(() => {
+  fetchMembers(route.query)
+})
 
 const createMember = async (formDetail) => {
   const { username, password, nickname, phone, group, lineId: line_id, note } = formDetail

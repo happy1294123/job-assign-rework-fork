@@ -30,7 +30,7 @@ const optionUrl = computed(() => route.query.search && `&filters[$and][1][name][
 watch(() => route.query, () => getProducts(optionUrl.value))
 const productList = ref(null)
 const getProducts = async (optionUrl) => {
-  const url = '/api/products?fields[0]=name&fields[1]=url&populate[image][fields]=url&filters[$and][0][isDisplay]=true' + optionUrl || ''
+  const url = '/api/products?fields[0]=name&fields[1]=url&fields[2]=status&populate[image][fields]=url&filters[$and][0][isDisplay]=true' + optionUrl || ''
   const { data } = await fetchWithoutToken(url)
   productList.value = data
 }

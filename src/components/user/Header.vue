@@ -6,8 +6,8 @@
       alt="logo"
       class="cursor-pointer"
       @click="() => router.push('/')"
-      >
-      <!-- :class="route.path === '/' ? 'block' : 'hidden md:block'" -->
+    >
+    <!-- :class="route.path === '/' ? 'block' : 'hidden md:block'" -->
     <span
       v-if="isLogin"
       class="md:hidden text-base text-primary"

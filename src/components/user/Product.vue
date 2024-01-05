@@ -40,9 +40,13 @@ const handleClick = () => {
     router.replace('/login')
     return
   }
+
   if (props.product.attributes.url) {
     window.open(props.product.attributes.url)
-    return
+  } else if (props.product.attributes.status === 'fill') {
+    connectCustomService('已報名，目前訂單額滿中')
+  } else if (props.product.attributes.status === 'fillable') {
+    connectCustomService('已報名，請待客服人員通知')
   } else {
     connectCustomService()
   }

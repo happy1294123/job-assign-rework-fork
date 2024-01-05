@@ -30,7 +30,7 @@
             </div>
             <div class="mt-4">
               <p class="mb-4 text-sm text-gray-400">
-                請洽客服人員
+                {{ text || '請洽客服人員' }}
               </p>
               <CustomButton
                 text="我知道了"
@@ -48,12 +48,17 @@
 <script setup>
 import CustomButton from './CustomButton.vue'
 import { ref } from 'vue'
+const text = ref('')
 
 const visible = ref(false)
 const close = () => {
   visible.value = false
+  text.value = ''
 }
-const open = () => {
+const open = (passText) => {
+  if (passText) {
+    text.value = passText
+  }
   visible.value = true
 }
 

@@ -4,7 +4,10 @@
       新增群組
     </template>
     <template v-slot:modalBody>
-      <MemberGroupForm @confirmForm="createGroup"></MemberGroupForm>
+      <MemberGroupForm
+        @confirmForm="createGroup"
+        :memberGroups="memberGroups"
+      />
     </template>
   </Modal>
   <Modal ref="editGroupModal">
@@ -13,9 +16,10 @@
     </template>
     <template v-slot:modalBody>
       <MemberGroupForm
-      :chosen-group-detail="chosenGroupDetail"
-      @confirmForm="editGroup">
-      </MemberGroupForm>
+        :chosen-group-detail="chosenGroupDetail"
+        :memberGroups="memberGroups"
+        @confirmForm="editGroup"
+      />
     </template>
   </Modal>
   <Layout>
@@ -23,7 +27,11 @@
       <div class="main">
         <div class="search">
           <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary ml-1" @click.prevent="createGroupModal.modalOpen()">
+          <button
+            type="button"
+            class="btn btn-primary ml-1"
+            @click.prevent="createGroupModal.modalOpen()"
+          >
             <i class="iconfont">&#xe665;</i>新增
           </button>
         </div>
@@ -41,7 +49,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="group in memberGroups" :key="group.id">
+              <tr
+                v-for="group in memberGroups"
+                :key="group.id"
+              >
                 <th scope="row">
                   {{ group.id }}
                 </th>
@@ -52,21 +63,31 @@
                   {{ group.count }}
                 </td>
                 <td>
-                  <input type="checkbox" v-model="group.isDefault" @click.stop.prevent>
+                  <input
+                    type="checkbox"
+                    v-model="group.isDefault"
+                    @click.stop.prevent
+                  >
                 </td>
                 <td>
                   {{ group.point_baseline }}
                 </td>
                 <td class="flex gap-2">
-                  <button class="btn btn-primary" @click.prevent="editButtonClick(group)">
+                  <button
+                    class="btn btn-primary"
+                    @click.prevent="editButtonClick(group)"
+                  >
                     編輯
                   </button>
-                  <button class="btn btn-danger" @click.prevent="removeGroup(group.id)">
+                  <button
+                    class="btn btn-danger"
+                    @click.prevent="removeGroup(group.id)"
+                  >
                     刪除
                   </button>
                 </td>
               </tr>
-              </tbody>
+            </tbody>
           </table>
         </div>
       </div>
@@ -80,10 +101,12 @@ import Layout from '../../components/admin/Layout.vue'
 import MemberGroupForm from '../../components/admin/form/MemberGroupForm.vue'
 import Modal from '@/components/admin/Modal.vue'
 import fetchWithToken from '@utils/fetchFn'
+import { useToast } from 'vue-toast-notification'
+const $toast = useToast()
 // import alertResult from '@utils/alertResult'
 
 const memberGroups = ref([])
-const createGroupModal= ref(null)
+const createGroupModal = ref(null)
 const editGroupModal = ref(null)
 const chosenGroupDetail = reactive({
   id: 0,
@@ -108,20 +131,20 @@ const fetchMemberGroup = async () => {
 fetchMemberGroup()
 
 const createGroup = async (formDetail) => {
-  const postBody = {
+  updateDefaultGroup(formDetail)
+
+  const { data } = await fetchWithToken('/api/groups', 'POST', {
     data: formDetail
-  }
-  const { data } = await fetchWithToken('/api/groups', 'POST', postBody)
+  })
   if (!data) {
     console.log('create error')
     return
   }
-  memberGroups.value.push({
-    id: data.id,
-    count: 0,
-    ...data.attributes,
-  })
   createGroupModal.value.modalClose()
+  $toast.success('成功創建群組', {
+    class: 'toast-default'
+  })
+  fetchMemberGroup()
 }
 
 const editButtonClick = (group) => {
@@ -136,25 +159,29 @@ const editButtonClick = (group) => {
 }
 
 const editGroup = async (formDetail) => {
-  const putBody = {
-    data: formDetail
-  }
+  updateDefaultGroup(formDetail)
   const { id } = chosenGroupDetail
-  const { data } = await fetchWithToken(`/api/groups/${id}`, 'PUT', putBody)
+  const { data } = await fetchWithToken(`/api/groups/${id}`, 'PUT', {
+    data: formDetail
+  })
   if (!data) {
     console.log('edit error')
     return
   }
-  memberGroups.value = memberGroups.value.map((group) => {
-    if (group.id === id) {
-      return {
-        ...group,
-        ...data.attributes,
-      }
-    }
-    return group
-  })
+  // memberGroups.value = memberGroups.value.map((group) => {
+  //   if (group.id === id) {
+  //     return {
+  //       ...group,
+  //       ...data.attributes,
+  //     }
+  //   }
+  //   return group
+  // })
   editGroupModal.value.modalClose()
+  $toast.success('成功編輯群組', {
+    class: 'toast-default'
+  })
+  fetchMemberGroup()
 }
 
 const removeGroup = async (id) => {
@@ -165,5 +192,19 @@ const removeGroup = async (id) => {
     return
   }
   memberGroups.value = memberGroups.value.filter((group) => group.id !== id)
+}
+
+const updateDefaultGroup = async (group) => {
+  if (group.isDefault) {
+    const allDefaultGroup = memberGroups.value.filter(group => group.isDefault)
+    for (const defaultGroup of allDefaultGroup) {
+      if (defaultGroup.id === group.id) continue
+      await fetchWithToken(`/api/groups/${defaultGroup.id}`, 'PUT', {
+        data: {
+          isDefault: null
+        }
+      })
+    }
+  }
 }
 </script>

@@ -67,12 +67,13 @@
           class="text-white"
           :style="{ backgroundColor: '#007bff', width: '100px', height: '30px' }"
         >
-          登入
+          <span v-if="isLoading">
+            <LoadingIcon />
+          </span>
+          <span v-else>
+            登入
+          </span>
         </button>
-        <!-- <CustomButton
-          text="登入"
-          class="w-[160px]"
-        /> -->
       </div>
       <span
         v-show="error.returnError"
@@ -102,8 +103,10 @@ const error = reactive({
   returnError: ''
 })
 
+const isLoading = ref(false)
 const router = useRouter()
 const handleSubmit = async () => {
+  isLoading.value = true
   if (!formData.username) {
     error.username = '帳號不能為空'
   }
@@ -114,6 +117,7 @@ const handleSubmit = async () => {
     error.captcha = '驗證碼錯誤'
   }
   if (error.username || error.password || error.captcha) {
+    isLoading.value = false
     return
   }
   document.getElementById('captcha').value = ''
@@ -126,19 +130,24 @@ const handleSubmit = async () => {
 
   if (data?.error?.status === 400 && data.error.message === 'Invalid identifier or password') {
     error.returnError = '帳號或密碼錯誤'
+    isLoading.value = false
     return
   }
 
   if (data.user.isAdmin) {
     localStorage.setItem('token', data.jwt)
-    location.href = '/admin/memberGroup'
+    localStorage.setItem('adminId', data.user.id)
+    location.href = '/admin/memberManage'
+    isLoading.value = false
     return
   }
 
   if (data.user.id) {
     error.returnError = '帳號或密碼錯誤'
+    isLoading.value = false
     return
   }
+  isLoading.value = false
 }
 
 onMounted(() => {

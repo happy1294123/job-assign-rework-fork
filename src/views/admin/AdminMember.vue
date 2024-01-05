@@ -95,8 +95,12 @@ import LogInRecord from '../../components/admin/LogInRecord.vue'
 import { ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import fetchWithToken from '@utils/fetchFn'
-// import { onMounted } from 'vue'
+import { useToast } from 'vue-toast-notification'
+const $toast = useToast()
+
 const route = useRoute()
+
+const pagination = inject('pagination')
 
 // handle tab
 const chosenTab = ref('accountInfo')
@@ -173,7 +177,8 @@ const filterPointLogInPeriod = async (formDetail) => {
     queryString += '&filters[$and][2][edit_point][$lt]=0'
   }
   // &filters[edit_point][$lt|$gt]=0
-  const { data } = await fetchWithToken(`/api/point-logs?${queryString}&sort[createdAt]=desc`)
+  const { data, meta } = await fetchWithToken(`/api/point-logs?${queryString}&sort[createdAt]=desc&pagination[page]=${pagination.page}&pagination[pageSize]=${pagination.pageSize}`)
+  Object.assign(pagination, meta.pagination)
   userPointLogInPeriod.value = data.map((item) => ({
     id: item.id,
     ...item.attributes,
@@ -191,7 +196,8 @@ const filterLogInInPeriod = async (formDetail) => {
     queryString += `&filters[$and][1][createdAt][$lt]=${formDetail.endDate}`
   }
   // &filters[edit_point][$lt|$gt]=0
-  const { data } = await fetchWithToken(`/api/login-logs?${queryString}&sort[createdAt]=desc`)
+  const { data, meta } = await fetchWithToken(`/api/login-logs?${queryString}&sort[createdAt]=desc&pagination[page]=${pagination.page}&pagination[pageSize]=${pagination.pageSize}`)
+  Object.assign(pagination, meta.pagination)
   userLoginLogPeriod.value = data.map((item) => ({
     id: item.id,
     ...item.attributes,
@@ -199,6 +205,7 @@ const filterLogInInPeriod = async (formDetail) => {
 }
 
 const editMember = async (userInfoDetail) => {
+  if (!confirm('確定要修改帳號資料？')) return
   const { nickname, phone, group, isActive, line_id, note } = userInfoDetail
   const putBody = {
     nickname,
@@ -209,38 +216,60 @@ const editMember = async (userInfoDetail) => {
     note,
   }
   const data = await fetchWithToken(`/api/users/${route.params.memberId}`, 'PUT', putBody)
-  console.log(data)
+  if (data.id) {
+    $toast.success('修改帳號資料成功', {
+      class: 'toast-default'
+    })
+  } else {
+    $toast.error('修改帳號資料失敗', {
+      class: 'toast-default'
+    })
+  }
 }
 
 const resetPassword = async (newPassword) => {
-  const putBody = {
+  if (!confirm('確定要修改此帳號的密碼嗎？')) return
+  const data = await fetchWithToken(`/api/users/${route.params.memberId}`, 'PUT', {
     password: newPassword
-  }
-  const data = await fetchWithToken(`/api/users/${route.params.memberId}`, 'PUT', putBody)
+  })
 
-  if (!data.data) {
-    console.log('reset password error')
-    return
+
+  if (data.id) {
+    $toast.success('修改密碼成功', {
+      class: 'toast-default'
+    })
+  } else {
+    $toast.error('修改密碼失敗', {
+      class: 'toast-default'
+    })
   }
 }
 
 const addBank = async (bankDetail) => {
+  if (!confirm('確定要新增銀行資料嗎？')) return
   const postBody = {
     data: {
       ...bankDetail,
+      account: String(bankDetail.account),
       user: route.params.memberId,
     }
   }
   const { data } = await fetchWithToken('/api/banks', 'POST', postBody)
+  console.log(data)
 
-  if (!data) {
-    console.log('add bank error')
-    return
+  if (data.id) {
+    $toast.success('新增銀行成功', {
+      class: 'toast-default'
+    })
+    bankList.value.push({
+      id: data.id,
+      ...bankDetail,
+    })
+  } else {
+    $toast.error('新增銀行失敗', {
+      class: 'toast-default'
+    })
   }
-  bankList.value.push({
-    id: data.id,
-    ...bankDetail,
-  })
 }
 
 const addCryptoAddress = async (cryptoAddress) => {
@@ -273,15 +302,19 @@ const removeBank = async (bankId) => {
 }
 
 const removeCryptoAddress = async (addressId) => {
-  if (!confirm('確定要刪除此錢包地址?')) return
+  if (!confirm('確定要刪除此虛擬錢包地址?')) return
   const { data } = await fetchWithToken(`/api/cryptos/${addressId}`, 'DELETE')
 
-  if (!data) {
-    console.log('remove crypto address error')
-    return
+  if (data.id) {
+    $toast.success('刪除虛擬錢包地址成功', {
+      class: 'toast-default'
+    })
+    cryptoAddressList.value = cryptoAddressList.value.filter((address) => address.id !== addressId)
+  } else {
+    $toast.error('刪除虛擬錢包地址失敗', {
+      class: 'toast-default'
+    })
   }
-
-  cryptoAddressList.value = cryptoAddressList.value.filter((address) => address.id !== addressId)
 }
 
 onMounted(async () => {

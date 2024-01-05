@@ -21,6 +21,17 @@
         </select>
       </div>
       <div class="form-group">
+        <label for="productIsDisplay">訂單狀態: </label>
+        <select
+          id="productStatus"
+          v-model="formDetail.status"
+        >
+          <option value="fill">額滿</option>
+          <option value="fillable">未額滿</option>
+          <option value="custom">自訂連結</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label for="productUrl">訂單連結: </label>
         <input
           type="text"
@@ -76,6 +87,7 @@ const props = defineProps({
     default: () => ({
       name: '',
       isDisplay: true,
+      status: 'fill',
       url: '',
       files: [],
     })
@@ -93,6 +105,7 @@ onMounted(() => {
 const formDetail = reactive({
   name: '',
   isDisplay: true,
+  status: 'fill',
   url: '',
   files: [],
 })
@@ -108,20 +121,6 @@ const previewFile = (event) => {
     productImgPreview.value = imageURL
   }
 }
-
-// const upload = async () => {
-//   const formData = new FormData()
-//   formData.append('files', formDetail.files[0])
-
-//   const file = await fetchUploadFileWithToken('/api/upload', formData)
-//   console.log(formDetail)
-//   console.log(file)
-//   if (!file) {
-//     console.log('image upload error')
-//     return
-//   }
-//   console.log('upload success')
-// }
 
 const confirmForm = () => {
   const { name } = formDetail

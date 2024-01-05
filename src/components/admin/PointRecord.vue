@@ -7,6 +7,35 @@
           <div class="card-body">
             <form>
               <div class="form-group row mb-2">
+                <span class="col-form-label mr-2 col-2">查詢時間</span>
+                <div class="input-group col-9">
+                  <button
+                    class="btn btn-secondary mr-3"
+                    @click.prevent="handleToday"
+                  >今日</button>
+                  <button
+                    class="btn btn-secondary mr-3"
+                    @click.prevent="handleYesterday"
+                  >昨日</button>
+                  <button
+                    class="btn btn-secondary mr-3"
+                    @click.prevent="handleThisWeek"
+                  >本週</button>
+                  <button
+                    class="btn btn-secondary mr-3"
+                    @click.prevent="handleLastWeek"
+                  >上週</button>
+                  <button
+                    class="btn btn-secondary mr-3"
+                    @click.prevent="handleThisMonth"
+                  >本月</button>
+                  <button
+                    class="btn btn-secondary mr-3"
+                    @click.prevent="handleLastMonth"
+                  >上月</button>
+                </div>
+              </div>
+              <div class="form-group row mb-2">
                 <span class="col-form-label mr-2 col-2">日期區間</span>
                 <div class="input-group col-9">
                   <label
@@ -99,35 +128,9 @@
         <div class="card">
           <h5 class="card-header">主錢包紀錄</h5>
           <div class="card-body p-0">
-            <!-- <div>
-              <div class="flex text-dark p-2">
-                共
-                <span>
-                  1
-                </span>
-                筆資料，總頁數
-                <span>
-                  1
-                </span>
-                頁 每頁筆數:
-                <div>
-                  <select name="itemsCount">
-                    <option value="10" selected>
-                      10
-                    </option>
-                  </select>
-                </div>
-                目前第:
-                <div>
-                  <select name="chosenPage">
-                    <option>
-                      1
-                    </option>
-                  </select>
-                </div>
-                頁
-              </div>
-            </div> -->
+
+            <AdminPagination />
+
             <div class="table-box">
               <table class="table">
                 <thead class="thead-dark">
@@ -170,8 +173,10 @@
 </template>
 
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { inject, onMounted, reactive } from 'vue'
 import { formatDate, formatTime } from '@utils/formatDateTime'
+import { formatISO, endOfYesterday, startOfYesterday, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
+
 defineProps({
   userPointLogInPeriod: {
     type: Array,
@@ -181,13 +186,59 @@ defineProps({
 const emit = defineEmits(['filterPointLogInPeriod'])
 
 const filterDetail = reactive({
-  startDate: '',
-  endDate: '',
+  startDate: formatISO(new Date()).slice(0, 10) + 'T00:00',
+  endDate: formatISO(new Date()).slice(0, 10) + 'T23:59',
   pointState: 'all',
 })
+
 
 const filterPointLogInPeriod = () => {
   emit('filterPointLogInPeriod', { ...filterDetail })
 }
 onMounted(filterPointLogInPeriod)
+const pagination = inject('pagination')
+watch(() => [pagination.page, pagination.pageSize], filterPointLogInPeriod)
+
+const handleToday = () => {
+  filterDetail.startDate = formatISO(new Date()).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(new Date()).slice(0, 10) + 'T23:59'
+}
+
+const handleYesterday = () => {
+  filterDetail.startDate = formatISO(startOfYesterday()).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfYesterday()).slice(0, 10) + 'T23:59'
+}
+
+const handleThisWeek = () => {
+  filterDetail.startDate = formatISO(startOfWeek(new Date())).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfWeek(new Date())).slice(0, 10) + 'T23:59'
+}
+
+const handleLastWeek = () => {
+  const now = new Date()
+  const lastWeek = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - 7
+  )
+  filterDetail.startDate = formatISO(startOfWeek(lastWeek)).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfWeek(lastWeek)).slice(0, 10) + 'T23:59'
+}
+
+const handleThisMonth = () => {
+  filterDetail.startDate = formatISO(startOfMonth(new Date())).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfMonth(new Date())).slice(0, 10) + 'T23:59'
+}
+
+const handleLastMonth = () => {
+  const now = new Date()
+  const lastMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() - 1,
+    now.getDate()
+  )
+  filterDetail.startDate = formatISO(startOfMonth(lastMonth)).slice(0, 10) + 'T00:00'
+  filterDetail.endDate = formatISO(endOfMonth(lastMonth)).slice(0, 10) + 'T23:59'
+}
+
 </script>

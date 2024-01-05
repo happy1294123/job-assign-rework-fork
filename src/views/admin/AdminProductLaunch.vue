@@ -44,6 +44,7 @@
                 <th scope="col">商品名稱</th>
                 <th scope="col">創建日期</th>
                 <th scope="col">發布狀態</th>
+                <th scope="col">訂單狀態</th>
                 <th scope="col">功能</th>
               </tr>
             </thead>
@@ -77,6 +78,11 @@
                     class="badge-danger badge-pill rounded-lg"
                     v-else
                   >隱藏</span>
+                </td>
+                <td>
+                  {{ product.status === 'fill' ? '額滿' : product.status === 'fillable' ? '未額滿' : product.status ===
+                    'custom' ? '自訂連結' : undefined
+                  }}
                 </td>
                 <td>
                   <button
@@ -114,12 +120,14 @@ const chosenProduct = reactive({
   id: 0,
   name: '',
   isDisplay: false,
+  status: 'fill',
   url: '',
   image: ''
 })
 
 const fetchProducts = async () => {
   const { data } = await fetchWithToken('/api/products?populate[image][fields]=url&sort[createdAt]=desc')
+  console.log(data)
   products.value = data.map((item) => ({
     id: item.id,
     ...item.attributes,
@@ -127,11 +135,12 @@ const fetchProducts = async () => {
 }
 
 const chooseProduct = (product) => {
-  const { id, name, isDisplay, url, image } = product
+  const { id, name, isDisplay, url, image, status } = product
   console.log(product)
   Object.assign(chosenProduct, {
     id,
     name,
+    status,
     isDisplay,
     url,
     image: image.data.attributes.url,
@@ -202,9 +211,6 @@ const editProduct = async (formDetail) => {
   formData.append('files', formDetail.files[0])
 
   const file = await fetchUploadFileWithToken('/api/upload', formData)
-
-  console.log(formDetail)
-  console.log(file)
 
   if (!file) {
     console.log('image upload error')

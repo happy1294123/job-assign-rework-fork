@@ -54,8 +54,6 @@
                   >員工群組</label>
                   <div class="col-auto">
                     <select
-                      name=""
-                      id=""
                       class="form-control"
                       v-model="filterDetail.group"
                     >
@@ -124,10 +122,7 @@
                 <div class="form-group">
                   <div class="mr-2"></div>
                   <div class="col-9">
-                    <button
-                      class="btn btn-primary"
-                      type="submit"
-                    >查詢</button>
+                    <button class="btn btn-primary">查詢</button>
                   </div>
                 </div>
               </form>
@@ -137,41 +132,13 @@
 
 
         <div class="card">
-          <h5 class="card-header">主錢包紀錄</h5>
+          <h5 class="card-header">點數紀錄</h5>
           <div class="card-body p-0">
-            <!-- <div>
-              <div class="flex text-dark p-2">
-                共
-                <span>
-                  1
-                </span>
-                筆資料，總頁數
-                <span>
-                  1
-                </span>
-                頁 每頁筆數:
-                <div>
-                  <select name="itemsCount">
-                    <option value="10" selected>
-                      10
-                    </option>
-                  </select>
-                </div>
-                目前第:
-                <div>
-                  <select name="chosenPage">
-                    <option>
-                      1
-                    </option>
-                  </select>
-                </div>
-                頁
-              </div>
-            </div> -->
+
+            <AdminPagination />
+
           </div>
         </div>
-
-
         <div class="table-box">
           <table class="table">
             <thead class="thead-dark">
@@ -246,23 +213,11 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import Layout from '../../components/admin/Layout.vue'
 import fetchWithToken from '@utils/fetchFn.js'
 import { formatDate, formatTime } from '@utils/formatDateTime'
-// import qs from 'qs'
-// /api/login-logs?filters[users]=14&filters[$and][0][createdAt][$gt]=2023-12-19T06:20:40Z&filters[$and][1][createdAt][$lt]=2023-12-19T08:50:00Z
-// const queryString = qs.stringify({
-//   fields: ['username', 'nickname', 'phone', 'main_point', 'createdAt', 'note', 'isActive'],
-//   populate: {
-//     group: {
-//       fields: ['name']
-//     },
-//     login_logs: true
-//   },
-//   sort: ['id'],
-//   // start: 2,
-//   // limit: 2
-// })
+import { formatISO } from 'date-fns'
+
 const filterDetail = reactive({
-  startDate: '',
-  endDate: '',
+  startDate: formatISO(new Date()).slice(0, 10) + 'T00:00',
+  endDate: formatISO(new Date()).slice(0, 10) + 'T23:59',
   info: '',
   group: null,
   pointState: 'all',
@@ -275,10 +230,13 @@ const fetchGroupOptions = async () => {
   groupOptions.value = data.map((group) => ({
     id: group.id,
     name: group.attributes.name,
+    isDefault: group.attributes.isDefault
   }))
+
+  filterDetail.group = groupOptions.value.find(group => group.isDefault)?.id || 0
 }
 
-// GET /api/users?fields[0]=username&fields[1]=nickname&fields[2]=phone&fields[3]=main_point&fields[4]=createdAt&fields[5]=note&populate[group][fields]=name&populate[login_logs][sort]=createdAt%3Adesc&filters[$or][0][username][$contains]={"username"}&filters[$or][1][nickname][$contains]={"nickname"}&filters[$or][2][phone][$contains]={"phone"}
+const pagination = inject('pagination')
 const fetchMembers = async () => {
   let queryString = ''
   if (filterDetail.startDate) {
@@ -306,7 +264,9 @@ const fetchMembers = async () => {
     queryString += '&filters[$and][4][edit_point][$lt]=0'
   }
 
-  const { data } = await fetchWithToken(`/api/point-logs?populate[0]=user&populate[1]=user.group${queryString}&filters[user][isAdmin]=false&sort[createdAt]=desc`)
+  const { data, meta } = await fetchWithToken(`/api/point-logs?populate[0]=user&populate[1]=user.group${queryString}&filters[user][isAdmin]=false&sort[createdAt]=desc`)
+  console.log(meta)
+  Object.assign(pagination, meta.pagination)
   pointLogs.value = data.map((item) => ({
     id: item.id,
     username: item.attributes.user.data?.attributes.username || '查無此人',

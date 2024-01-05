@@ -1,71 +1,3 @@
-<!-- <script setup>
-import fetchWithToken from '@utils/fetchFn'
-import alertResult from '@utils/alertResult'
-import { reactive } from 'vue'
-const route = useRoute()
-
-// bank
-const bank = reactive({
-  bank_name: '',
-  branch_name: '',
-  account: '',
-  account_name: '',
-})
-const handleAddBank = async () => {
-  const { data } = await fetchWithToken('/api/banks', 'POST', {
-    data: {
-      ...bank,
-      user: String(route.params.memberId)
-    }
-  })
-  alertResult(data.id, '新增銀行')
-  fetchUserBankList()
-}
-
-const bankList = ref([])
-const fetchUserBankList = async () => {
-  const { data } = await fetchWithToken(`/api/banks?filters[user]=${route.params.memberId}`)
-  bankList.value = data
-}
-fetchUserBankList()
-
-const handleDeleteBank = async (bankId) => {
-  if (!confirm('確定要刪除此銀行？')) return
-  const { data } = await fetchWithToken(`/api/banks/${bankId}`, 'DELETE')
-  alertResult(data.id, '刪除銀行')
-  fetchUserBankList()
-}
-
-// crypto 
-const cryptoAddress = ref('')
-const handleAddCrypto = async () => {
-  const { data } = await fetchWithToken('/api/cryptos', 'POST', {
-    data: {
-      address: cryptoAddress.value,
-      user: String(route.params.memberId)
-    }
-  })
-  console.log(data)
-  alertResult(data.id, '新增虛擬錢包地址')
-  fetchUserCryptoList()
-}
-
-const cryptoList = ref([])
-const fetchUserCryptoList = async () => {
-  const { data } = await fetchWithToken(`/api/cryptos?filters[user]=${route.params.memberId}`)
-  console.log(data)
-  cryptoList.value = data
-}
-fetchUserCryptoList()
-
-const handleDeleteCrypto = async (cryptoId) => {
-  if (!confirm('確定要刪除此虛擬錢包地址？')) return
-  const { data } = await fetchWithToken(`/api/cryptos/${cryptoId}`, 'DELETE')
-  alertResult(data.id, '刪除虛擬錢包地址')
-  fetchUserBankList()
-}
-
-</script> -->
 <template>
   <div class="pt-3 text-dark">
     <div class="row row-cols-2 mb-2">
@@ -78,7 +10,7 @@ const handleDeleteCrypto = async (cryptoId) => {
                 <label for="bankName" class="col-sm-3 col-form-label">銀行名稱</label>
                 <div class="col-9">
                   <select class="form-control" name="bankName" id="bankName" v-model="bankDetail.bank_name">
-                    <option value="中國信託商業銀行(822)">中國信託商業銀行(822)</option>
+                    <option v-for="bank in taiwanBankList" :key="bank.code" :value="`${bank.name}(${bank.code})`">{{bank.name}}({{ bank.code }})</option>
                   </select>
                 </div>
               </div>
@@ -100,7 +32,7 @@ const handleDeleteCrypto = async (cryptoId) => {
               <div class="form-group row mb-2">
                 <label for="bankAccount" class="col-sm-3 col-form-label">銀行帳號</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="bankAccount" v-model="bankDetail.account">
+                  <input type="number" class="form-control" id="bankAccount" v-model="bankDetail.account">
                 </div>
               </div>
               <div class="form-group row">
@@ -118,7 +50,7 @@ const handleDeleteCrypto = async (cryptoId) => {
           <h5 class="card-header">銀行列表</h5>
           <div class="card-body p-0">
             <table class="table table-borderless">
-              <tbody>
+              <tbody class="h-[300px]">
                 <tr v-for="bank in bankList" :key="bank.id">
                   <th>{{ bank.bank_name }}</th>
                   <td>{{ bank.account}}</td>
@@ -127,6 +59,9 @@ const handleDeleteCrypto = async (cryptoId) => {
                     <button class="btn btn-warning" @click.stop.prevent="removeBank(bank.id)">刪除</button>
                   </td>
                 </tr>
+                <div v-if="bankList.length === 0" class="text-gray-400 text-sm flex justify-center my-[100px]">
+                  沒有銀行列表
+                </div>
               </tbody>
             </table>
           </div>
@@ -134,7 +69,7 @@ const handleDeleteCrypto = async (cryptoId) => {
       </div>
     </div>
     <div class="row row-cols-2">
-      <div class="col-6">
+      <div class="col-6 mb-10">
         <div class="card">
           <h5 class="card-header">虛擬錢包位址(TRC通道) USDT</h5>
           <div class="card-body">
@@ -148,7 +83,7 @@ const handleDeleteCrypto = async (cryptoId) => {
           </div>
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-6  mb-10">
         <div class="card">
           <h5 class="card-header">錢包列表</h5>
           <div class="card-body p-0">
@@ -171,6 +106,10 @@ const handleDeleteCrypto = async (cryptoId) => {
 
 <script setup>
 import { ref, reactive } from 'vue'
+import taiwanBankList from '@/assets/json/taiwanBankList.json'
+import { useToast } from 'vue-toast-notification'
+const $toast = useToast()
+
 defineProps({
   bankList: {
     type: Array,
@@ -183,7 +122,7 @@ defineProps({
 })
 
 const bankDetail = reactive({
-  bank_name: '中國信託商業銀行(822)',
+  bank_name: '中央銀行國庫局(000)',
   branch_name: '',
   account: '',
   account_name: '',
@@ -193,7 +132,9 @@ const emit = defineEmits(['addBank', 'addCryptoAddress', 'removeBank', 'removeCr
 const addBank = () => {
   const { branch_name, account, account_name} = bankDetail
   if (!branch_name || !account || !account_name) {
-    console.log('欄位不得為空')
+    $toast.error('欄位不得為空', {
+      class: 'toast-default'
+    })
     return
   }
   emit('addBank', {...bankDetail})
@@ -201,6 +142,7 @@ const addBank = () => {
 }
 
 const addCryptoAddress = () => {
+  if (!confirm('確定要新增虛擬錢包位址？')) return
   cryptoAddress.value = cryptoAddress.value.trim()
   if (!cryptoAddress.value) {
     console.log('虛擬錢包位址欄位不得為空')

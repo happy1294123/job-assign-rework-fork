@@ -1,8 +1,35 @@
 <template>
+  <Modal ref="editPasswordModal">
+    <template v-slot:modalTitle>
+      修改密碼
+    </template>
+    <template v-slot:modalBody>
+      <form
+        class="flex"
+        @submit.prevent="handleEditPassword"
+      >
+        <input
+          type="password"
+          class="form-control"
+          v-model="newPassword"
+        >
+        <button
+          type="submit"
+          class="btn btn-primary whitespace-nowrap w-[123px]"
+        ><span v-if="isLoading">
+            <LoadingIcon />
+          </span>
+          <span v-else>
+            重設管理者登入密碼
+          </span></button>
+      </form>
+      <div class="text-red-400 text-sm">
+        {{ error }}
+      </div>
+    </template>
+  </Modal>
   <header>
     <div class="dropdown float-right flex">
-
-
       <button
         class="btn  btn-sm  d-flex items-center"
         type="button"
@@ -10,6 +37,7 @@
         data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false"
+        @click="handleClickAdminName"
       >
         <svg
           width="20"
@@ -31,20 +59,16 @@
         class="dropdown-item cursor-pointer"
         @click.stop.prevent="logout"
       >登出</a>
-
-
-      <!-- <div
-        class="dropdown-menu dropdown-menu-right"
-        aria-labelledby="dropdownMenu2"
-      >
-      </div> -->
     </div>
   </header>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import fetchWithToken from '@utils/fetchFn'
+import Modal from '@/components/admin/Modal.vue'
+import { useToast } from 'vue-toast-notification'
+import { countIdleLogout, removeCountIdleLogout } from '@utils/countIdleLogout'
 
 const nickname = ref('')
 
@@ -56,7 +80,7 @@ if (!token) {
 
 const logout = () => {
   localStorage.setItem('token', '')
-  location.href = '/'
+  location.href = '/admin'
 }
 
 onMounted(async () => {
@@ -66,5 +90,61 @@ onMounted(async () => {
     router.replace('/')
     alert('無管理者權限')
   }
+  // not use 10 mins, auto logout 
+  countIdleLogout()
 })
+
+onUnmounted(() => removeCountIdleLogout)
+
+const editPasswordModal = ref(null)
+const handleClickAdminName = () => {
+  editPasswordModal.value.modalOpen()
+}
+
+
+// edit password
+const $toast = useToast()
+const newPassword = ref('')
+watch(newPassword, () => {
+  error.value = ''
+})
+const isLoading = ref(false)
+const error = ref('')
+const handleEditPassword = async () => {
+  if (newPassword.value === '') {
+    error.value = '請輸入密碼'
+    return
+  }
+  if (newPassword.value.length < 6) {
+    error.value = '密碼至少6位元'
+    return
+  }
+  if (!confirm('確定要修改密碼嗎？')) return
+  isLoading.value = true
+
+  const adminId = localStorage.getItem('adminId')
+  if (!adminId) {
+    error.value = '發生錯誤'
+    isLoading.value = false
+    return
+  }
+
+  const data = await fetchWithToken(`/api/users/${adminId}`, 'PUT', {
+    password: newPassword.value
+  })
+
+  if (data.id) {
+    $toast.success('密碼修改成功', {
+      class: 'toast-default'
+    })
+  } else {
+    $toast.success('密碼修改失敗', {
+      class: 'toast-default'
+    })
+  }
+
+  editPasswordModal.value.modalClose()
+  newPassword.value = ''
+  isLoading.value = false
+}
 </script>

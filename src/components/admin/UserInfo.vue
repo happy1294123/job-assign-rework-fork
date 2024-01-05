@@ -1,61 +1,3 @@
-<!-- <script setup>
-import fetchWithToken from '@utils/fetchFn'
-import alertResult from '@utils/alertResult'
-import formatDateTime from '@utils/formatDateTime'
-const route = useRoute()
-
-const groupOptions = ref([])
-onMounted(async () => {
-  const { data } = await fetchWithToken('/api/groups?fields[0]=name&fields[1]=isDefault')
-  groupOptions.value = data?.map(group => ({ id: group.id, name: group.attributes.name }))
-  fetchMemberById()
-  fetchUserPointLog()
-})
-
-const userInfo = reactive({
-  username: '',
-  nickname: '',
-  phone: '',
-  isActive: 'false',
-  group: undefined,
-  line_id: '',
-  note: '',
-  createdAt: '',
-  main_point: 0
-})
-const fetchMemberById = async () => {
-  const data = await fetchWithToken(`/api/users/${route.params.memberId}?populate[group][fields]=name`)
-  Object.assign(userInfo, data)
-  userInfo.group = data.group.id
-  userInfo.isActive = String(data.isActive)
-}
-
-const pointLog = reactive({
-  add: 0,
-  minus: 0,
-})
-const fetchUserPointLog = async () => {
-  const data = await fetchWithToken(`/api/point-log/${route.params.memberId}`)
-  Object.assign(pointLog, data)
-}
-
-const handleSubmit = async () => {
-  const data = await fetchWithToken(`/api/users/${route.params.memberId}`, 'PUT', userInfo)
-  alertResult(data.id, '修改')
-}
-
-// reset password
-const newPassword = ref('')
-const resetPassword = async () => {
-  const data = await fetchWithToken(`/api/users/${route.params.memberId}`, 'PUT', {
-    password: newPassword.value
-  })
-  alertResult(data.id, '重設登入密碼')
-}
-
-defineExpose({ username: userInfo.username })
-</script> -->
-
 <template>
   <div class="pt-3 text-dark">
     <div class="row">
@@ -81,7 +23,7 @@ defineExpose({ username: userInfo.username })
               <div class="form-group row mb-2">
                 <label for="memberPhone" class="col-sm-3 col-form-label">電話</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="memberPhone" v-model="userInfoDetail.phone">
+                  <input type="number" class="form-control" id="memberPhone" v-model="userInfoDetail.phone">
                 </div>
               </div>
 
@@ -170,7 +112,7 @@ defineExpose({ username: userInfo.username })
             <h5 class="card-header">密碼管理</h5>
             <div class="card-body text-center">
               <form class="form-inline" @submit.prevent.stop="resetPassword">
-                <input type="text" class="form-control" v-model="newPassword">
+                <input type="password" class="form-control" v-model="newPassword">
                 <button type="submit" class="btn btn-primary">重設登入密碼</button>
               </form>
             </div>
