@@ -4,8 +4,7 @@
       新增公告
     </template>
     <template v-slot:modalBody>
-      <AnnouncementForm
-        @confirmForm="createAnnouncement">
+      <AnnouncementForm @confirmForm="createAnnouncement">
       </AnnouncementForm>
     </template>
   </Modal>
@@ -14,9 +13,7 @@
       修改公告
     </template>
     <template v-slot:modalBody>
-      <AnnouncementForm
-        :announcement-info="chosenAnnouncement"
-        @confirmForm="editAnnouncement">
+      <AnnouncementForm :announcement-info="chosenAnnouncement" @confirmForm="editAnnouncement">
       </AnnouncementForm>
     </template>
   </Modal>
@@ -24,7 +21,8 @@
     <template v-slot:content>
       <div class="main">
         <div class="search">
-          <button type="button" class="btn btn-primary float-left mr-1" @click.prevent="createAnnouncementModal.modalOpen()">
+          <button type="button" class="btn btn-primary float-left mr-1"
+            @click.prevent="createAnnouncementModal.modalOpen()">
             <i class="iconfont">&#xe665;</i>新增
           </button>
         </div>
@@ -32,12 +30,12 @@
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">編號</th>
-                <th scope="col">公告標題</th>
-                <th scope="col">公告內文</th>
-                <th scope="col">公告狀態</th>
-                <th scope="col">跑馬燈顯示</th>
-                <th scope="col">功能</th>
+                <th class="text-nowrap" scope="col">編號</th>
+                <th class="text-nowrap" scope="col">公告標題</th>
+                <th class="text-nowrap" scope="col">公告內文</th>
+                <th class="text-nowrap" scope="col">公告狀態</th>
+                <th class="text-nowrap" scope="col">跑馬燈顯示</th>
+                <th class="text-nowrap" scope="col">功能</th>
               </tr>
             </thead>
             <tbody>
@@ -59,12 +57,12 @@
                   <span class="badge-success badge-pill rounded-lg" v-if="announcement.isMarquee">啟用</span>
                   <span class="badge-danger badge-pill rounded-lg" v-else>停用</span>
                 </td>
-                <td class="flex">
-                  <button class="btn btn-primary" @click="chooseAnnouncement(announcement)">修改</button>
-                  <button class="btn btn-danger" @click="removeAnnouncement(announcement)">刪除</button>
+                <td class="flex gap-2">
+                  <button class="text-nowrap btn btn-primary" @click="chooseAnnouncement(announcement)">修改</button>
+                  <button class="text-nowrap btn btn-danger" @click="removeAnnouncement(announcement)">刪除</button>
                 </td>
               </tr>
-              </tbody>
+            </tbody>
           </table>
         </div>
       </div>

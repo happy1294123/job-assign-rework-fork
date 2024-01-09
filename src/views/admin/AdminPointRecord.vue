@@ -10,89 +10,39 @@
                 <div class="form-group row mb-2">
                   <span class="col-form-label col-auto">查詢時間</span>
                   <div class="input-group col-9">
-                    <button
-                      class="btn btn-secondary mr-3"
-                      @click.prevent="handleToday"
-                    >今日</button>
-                    <button
-                      class="btn btn-secondary mr-3"
-                      @click.prevent="handleYesterday"
-                    >昨日</button>
-                    <button
-                      class="btn btn-secondary mr-3"
-                      @click.prevent="handleThisWeek"
-                    >本週</button>
-                    <button
-                      class="btn btn-secondary mr-3"
-                      @click.prevent="handleLastWeek"
-                    >上週</button>
-                    <button
-                      class="btn btn-secondary mr-3"
-                      @click.prevent="handleThisMonth"
-                    >本月</button>
-                    <button
-                      class="btn btn-secondary mr-3"
-                      @click.prevent="handleLastMonth"
-                    >上月</button>
+                    <button class="btn btn-secondary mr-3" @click.prevent="handleToday">今日</button>
+                    <button class="btn btn-secondary mr-3" @click.prevent="handleYesterday">昨日</button>
+                    <button class="btn btn-secondary mr-3" @click.prevent="handleThisWeek">本週</button>
+                    <button class="btn btn-secondary mr-3" @click.prevent="handleLastWeek">上週</button>
+                    <button class="btn btn-secondary mr-3" @click.prevent="handleThisMonth">本月</button>
+                    <button class="btn btn-secondary mr-3" @click.prevent="handleLastMonth">上月</button>
                   </div>
                 </div>
 
                 <div class="form-group row mb-2">
                   <span class="col-form-label col-auto">日期區間</span>
                   <div class="input-group col-9">
-                    <label
-                      class="sr-only"
-                      for="startDateTime"
-                    ></label>
-                    <input
-                      type="datetime-local"
-                      class="form-control"
-                      id="startDateTime"
-                      v-model="filterDetail.startDate"
-                    >
+                    <label class="sr-only" for="startDateTime"></label>
+                    <input type="datetime-local" class="form-control" id="startDateTime" v-model="filterDetail.startDate">
                     <div class="input-group-prepend input-group-append">
                       <label class="input-group-text">-</label>
                     </div>
-                    <label
-                      class="sr-only"
-                      for="endDateTime"
-                    ></label>
-                    <input
-                      type="dateTime-local"
-                      class="form-control"
-                      id="endDateTime"
-                      v-model="filterDetail.endDate"
-                    >
+                    <label class="sr-only" for="endDateTime"></label>
+                    <input type="dateTime-local" class="form-control" id="endDateTime" v-model="filterDetail.endDate">
                   </div>
                 </div>
 
                 <div class="form-group row mb-2">
-                  <label
-                    for="memberInfo"
-                    class="col-form-label col-auto"
-                  >帳號/姓名</label>
+                  <label for="memberInfo" class="col-form-label col-auto">帳號/姓名</label>
                   <div class="col-auto">
-                    <input
-                      type="text"
-                      class="form-control"
-                      v-model="filterDetail.info"
-                    >
+                    <input type="text" class="form-control" v-model="filterDetail.info">
                   </div>
-                  <label
-                    for="memberInfo"
-                    class="col-form-label col-auto"
-                  >員工群組</label>
+                  <label for="memberInfo" class="col-form-label col-auto">員工群組</label>
                   <div class="col-auto">
-                    <select
-                      class="form-control"
-                      v-model="filterDetail.group"
-                    >
-                      <option :value="null">無</option>
-                      <option
-                        :value="option.id"
-                        v-for="option in groupOptions"
-                        :key="option.id"
-                      >{{ option.name }}</option>
+                    <select class="form-control" v-model="filterDetail.group">
+                      <option :value="null">全部</option>
+                      <option :value="option.id" v-for="option in groupOptions" :key="option.id">{{ option.name }}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -104,48 +54,21 @@
                   <span class="col-form-label col-auto">狀態</span>
                   <div class="col-auto">
                     <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        name="pointState"
-                        id="all"
-                        v-model="filterDetail.pointState"
-                        value="all"
-                      >
-                      <label
-                        class="form-check-label"
-                        for="all"
-                      >全部</label>
+                      <input class="form-check-input" type="radio" name="pointState" id="all"
+                        v-model="filterDetail.pointState" value="all">
+                      <label class="form-check-label" for="all">全部</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        name="pointState"
-                        id="add"
-                        v-model="filterDetail.pointState"
-                        value="add"
-                      >
-                      <label
-                        class="form-check-label"
-                        for="add"
-                      >補點</label>
+                      <input class="form-check-input" type="radio" name="pointState" id="add"
+                        v-model="filterDetail.pointState" value="add">
+                      <label class="form-check-label" for="add">補點</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        name="pointState"
-                        id="minus"
-                        v-model="filterDetail.pointState"
-                        value="minus"
-                      >
-                      <label
-                        class="form-check-label"
-                        for="minus"
-                      >扣點</label>
+                      <input class="form-check-input" type="radio" name="pointState" id="minus"
+                        v-model="filterDetail.pointState" value="minus">
+                      <label class="form-check-label" for="minus">扣點</label>
                     </div>
                   </div>
                 </div>
@@ -173,31 +96,25 @@
           <table class="table">
             <thead class="thead-dark">
               <tr>
-                <th scope="col">編號</th>
-                <th scope="col">員工帳號</th>
-                <th scope="col">姓名</th>
-                <th scope="col">狀態</th>
-                <th scope="col">群組</th>
-                <th scope="col">點數紀錄</th>
-                <th scope="col">主錢包餘額</th>
-                <th scope="col">異動時間</th>
-                <th scope="col">事由</th>
+                <th class="text-nowrap" scope="col">編號</th>
+                <th class="text-nowrap" scope="col">員工帳號</th>
+                <th class="text-nowrap" scope="col">姓名</th>
+                <th class="text-nowrap" scope="col">狀態</th>
+                <th class="text-nowrap" scope="col">群組</th>
+                <th class="text-nowrap" scope="col">點數紀錄</th>
+                <th class="text-nowrap" scope="col">主錢包餘額</th>
+                <th class="text-nowrap" scope="col">異動時間</th>
+                <th class="text-nowrap" scope="col">事由</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="log in pointLogs"
-                :key="log.id"
-              >
+              <tr v-for="log in pointLogs" :key="log.id">
                 <th scope="row">{{ log.id }}</th>
                 <td>{{ log.username }}</td>
                 <td>{{ log.nickname }}</td>
                 <td>{{ log.isActive }}</td>
                 <td>{{ log.group }}</td>
-                <td
-                  class="flex"
-                  :class="{ 'text-success': log.edit_point > 0, 'text-danger': log.edit_point < 0 }"
-                >
+                <td class="flex" :class="{ 'text-success': log.edit_point > 0, 'text-danger': log.edit_point < 0 }">
 
                   <span v-if="log.edit_point > 0">+</span>
                   {{ log.edit_point }}
@@ -215,14 +132,8 @@
               </tr>
               <tr>
                 <td colspan="3"></td>
-                <td
-                  colspan="2"
-                  class="text-center"
-                >總計</td>
-                <td
-                  class="flex"
-                  :class="{ 'text-success': totalPoints > 0, 'text-danger': totalPoints < 0 }"
-                >
+                <td colspan="2" class="text-center">總計</td>
+                <td class="flex" :class="{ 'text-success': totalPoints > 0, 'text-danger': totalPoints < 0 }">
                   <span v-if="totalPoints > 0">+</span>
                   {{ totalPoints }}
                 </td>

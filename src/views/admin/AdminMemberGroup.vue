@@ -4,10 +4,7 @@
       新增群組
     </template>
     <template v-slot:modalBody>
-      <MemberGroupForm
-        @confirmForm="createGroup"
-        :memberGroups="memberGroups"
-      />
+      <MemberGroupForm @confirmForm="createGroup" :memberGroups="memberGroups" />
     </template>
   </Modal>
   <Modal ref="editGroupModal">
@@ -15,11 +12,7 @@
       編輯群組
     </template>
     <template v-slot:modalBody>
-      <MemberGroupForm
-        :chosen-group-detail="chosenGroupDetail"
-        :memberGroups="memberGroups"
-        @confirmForm="editGroup"
-      />
+      <MemberGroupForm :chosen-group-detail="chosenGroupDetail" :memberGroups="memberGroups" @confirmForm="editGroup" />
     </template>
   </Modal>
   <Layout>
@@ -27,11 +20,7 @@
       <div class="main">
         <div class="search">
           <!-- Button trigger modal -->
-          <button
-            type="button"
-            class="btn btn-primary ml-1"
-            @click.prevent="createGroupModal.modalOpen()"
-          >
+          <button type="button" class="btn btn-primary ml-1" @click.prevent="createGroupModal.modalOpen()">
             <i class="iconfont">&#xe665;</i>新增
           </button>
         </div>
@@ -40,19 +29,16 @@
           <table class="table">
             <thead>
               <tr>
-                <th scope="col">編號</th>
-                <th scope="col">員工群組名稱</th>
-                <th scope="col">人數</th>
-                <th scope="col">預設群組</th>
-                <th scope="col">門檻點數設定</th>
-                <th scope="col">功能</th>
+                <th class="text-nowrap" scope="col">編號</th>
+                <th class="text-nowrap" scope="col">員工群組名稱</th>
+                <th class="text-nowrap" scope="col">人數</th>
+                <th class="text-nowrap" scope="col">預設群組</th>
+                <th class="text-nowrap" scope="col">門檻點數設定</th>
+                <th class="text-nowrap" scope="col">功能</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="group in memberGroups"
-                :key="group.id"
-              >
+              <tr v-for="group in memberGroups" :key="group.id">
                 <th scope="row">
                   {{ group.id }}
                 </th>
@@ -63,26 +49,16 @@
                   {{ group.count }}
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    v-model="group.isDefault"
-                    @click.stop.prevent
-                  >
+                  <input type="checkbox" v-model="group.isDefault" @click.stop.prevent>
                 </td>
                 <td>
                   {{ group.point_baseline }}
                 </td>
                 <td class="flex gap-2">
-                  <button
-                    class="btn btn-primary"
-                    @click.prevent="editButtonClick(group)"
-                  >
+                  <button class="text-nowrap btn btn-primary" @click.prevent="editButtonClick(group)">
                     編輯
                   </button>
-                  <button
-                    class="btn btn-danger"
-                    @click.prevent="removeGroup(group.id)"
-                  >
+                  <button class="text-nowrap btn btn-danger" @click.prevent="removeGroup(group.id)">
                     刪除
                   </button>
                 </td>

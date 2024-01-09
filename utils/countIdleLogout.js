@@ -1,6 +1,7 @@
 let timeId
 
 export function countIdleLogout() {    
+    console.log('countIdleLogout')
     document.addEventListener('mousemove', resetTime)
 }
 
@@ -14,5 +15,5 @@ function resetTime() {
         localStorage.removeItem('token')
         localStorage.removeItem('adminId')
         location.href = '/admin'
-    }, 600000)
+    }, 1000 * 60 * 10)
 }
