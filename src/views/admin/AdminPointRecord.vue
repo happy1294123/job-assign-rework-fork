@@ -112,7 +112,7 @@
                 <th scope="row">{{ log.id }}</th>
                 <td>{{ log.username }}</td>
                 <td>{{ log.nickname }}</td>
-                <td>{{ log.isActive }}</td>
+                <td>{{ log.isActive ? '啟用' : '停用' }}</td>
                 <td>{{ log.group }}</td>
                 <td class="flex" :class="{ 'text-success': log.edit_point > 0, 'text-danger': log.edit_point < 0 }">
 
@@ -181,7 +181,6 @@ const pagination = inject('pagination')
 const fetchMembers = async () => {
   let queryString = ''
   if (filterDetail.startDate) {
-    console.log('start')
     queryString += `&filters[$and][0][createdAt][$gt]=${filterDetail.startDate}`
   }
 
@@ -206,14 +205,15 @@ const fetchMembers = async () => {
   }
 
   const { data, meta } = await fetchWithToken(`/api/point-logs?populate[0]=user&populate[1]=user.group${queryString}&filters[user][isAdmin]=false&sort[createdAt]=desc`)
-  console.log(meta)
+  console.log(data)
+  // console.log(meta)
   Object.assign(pagination, meta.pagination)
   pointLogs.value = data.map((item) => ({
     id: item.id,
     username: item.attributes.user.data?.attributes.username || '查無此人',
     nickname: item.attributes.user.data?.attributes.nickname || '查無此人',
-    isActive: item.attributes.user.data?.attributes.isActive || '查無此人',
-    group: item.attributes.user.data?.attributes.group?.data.attributes.name || '查無群組',
+    isActive: item.attributes.user.data?.attributes.isActive || false,
+    group: item.attributes.user.data?.attributes.group?.data?.attributes?.name || '-',
     edit_point: item.attributes.edit_point,
     balance: item.attributes.balance,
     createdAt: item.attributes.createdAt,

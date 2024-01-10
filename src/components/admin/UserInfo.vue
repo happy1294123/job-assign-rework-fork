@@ -125,6 +125,9 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { useToast } from 'vue-toast-notification'
+const $toast = useToast()
+
 const props = defineProps({
   userInfo: {
     type: Object,
@@ -166,14 +169,23 @@ const resetPassword = () => {
   newPassword.value = newPassword.value.trim()
   if (!newPassword.value) {
     console.log('密碼欄位不得為空')
+    $toast.error('密碼欄位不得為空', {
+      class: 'toast-default'
+    })
     return
   }
   if (newPassword.value.indexOf(' ') >= 0) {
     console.log('密碼欄位字元間不得有空白')
+    $toast.error('密碼欄位字元間不得有空白', {
+      class: 'toast-default'
+    })
     return
   }
   if (newPassword.value.length < 6) {
     console.log('密碼須超過六個字元')
+    $toast.error('密碼須超過六個字元', {
+      class: 'toast-default'
+    })
     return
   }
   emit('resetPassword', newPassword.value)

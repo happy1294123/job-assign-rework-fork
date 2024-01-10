@@ -56,8 +56,10 @@ const close = () => {
   text.value = ''
 }
 const open = (passText) => {
-  if (passText) {
+  if (typeof passText === 'string') {
     text.value = passText
+  } else {
+    text.value = ''
   }
   visible.value = true
 }

@@ -209,7 +209,7 @@ const editMember = async (userInfoDetail) => {
   const { nickname, phone, group, isActive, line_id, note } = userInfoDetail
   const putBody = {
     nickname,
-    phone,
+    phone: String(phone),
     group,
     isActive,
     line_id,
@@ -232,6 +232,8 @@ const resetPassword = async (newPassword) => {
   const data = await fetchWithToken(`/api/users/${route.params.memberId}`, 'PUT', {
     password: newPassword
   })
+
+  console.log(data)
 
 
   if (data.id) {
