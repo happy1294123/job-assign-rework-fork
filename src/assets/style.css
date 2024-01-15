@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body{
+  font-family: 'Noto Sans TC', '微軟正黑體', sans-serif;
+}
+
 .toast-default {
     background-color: #007bff !important ;    
 }

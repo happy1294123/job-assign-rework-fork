@@ -1,31 +1,39 @@
 <template>
   <div
-    class="w-max-[300px] h-max-[300px] aspect-square rounded-lg overflow-hidden flex justify-center items-end cursor-pointer"
+    class="w-max-[300px] h-max-[350px] aspect-auto overflow-clip rounded-lg flex flex-col justify-between cursor-pointer shadow-xl border p-3"
     @click="handleClick"
   >
-    <img
-      v-if="imageUrl"
-      :src="imageUrl"
-      alt="product img"
-      class="object-cover w-full h-full"
-    >
-    <img
-      v-else
-      src="@/assets/default-image.png"
-      alt=""
-    >
-    <div class="absolute flex flex-col gap-3 mb-10">
-      <span class="text-white font-extralight text-center">{{ props.product.attributes.name }}</span>
-      <CustomButton
-        text="開始訂單"
-        secondary
-      />
+    <div>
+      <div>
+        <img
+          v-if="imageUrl"
+          :src="imageUrl"
+          alt="product img"
+          class="w-full aspect-auto"
+        >
+        <img
+          v-else
+          src="@/assets/default-image.png"
+          alt=""
+        >
+      </div>
+    </div>
+    <div class="flex flex-col mt-3 gap-2">
+      <span class="font-extralight text-center">{{ props.product.attributes.name }}</span>
+      <button
+        :class="`bg-secondary text-white px-4 py-1.5 !rounded-lg text-sm whitespace-nowrap`"
+        :disabled="isLoading"
+      >
+        <span >
+          開始訂單
+        </span>
+    </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import CustomButton from '@/components/CustomButton.vue'
+// import CustomButton from '@/components/CustomButton.vue'
 import { inject } from 'vue'
 import { useRouter } from 'vue-router'
 const connectCustomService = inject('connectCustomService')
