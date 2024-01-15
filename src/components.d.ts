@@ -30,6 +30,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UserAnnouncementContent: typeof import('./components/user/AnnouncementContent.vue')['default']
+    UserFooter: typeof import('./components/user/Footer.vue')['default']
     UserHeader: typeof import('./components/user/Header.vue')['default']
     UserLayout: typeof import('./components/user/Layout.vue')['default']
     UserMarquee: typeof import('./components/user/Marquee.vue')['default']

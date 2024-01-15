@@ -1,6 +1,6 @@
 <template>
   <button
-    :class="`${bgColor} text-white px-4 py-1.5 !rounded-full text-sm whitespace-nowrap`"
+    :class="`${bgColor} text-white px-4 pb-1.5 pt-1 !rounded-full text-sm whitespace-nowrap`"
     :disabled="isLoading"
   >
     <span v-if="isLoading">

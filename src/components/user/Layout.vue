@@ -8,9 +8,7 @@
         </div>
       </main>
     </div>
-    <div class="h-10 w-full bottom-0 bg-[#5D6279] text-white flex justify-center items-center text-[10px] mt-10">
-      2020 Dispatch Matching Platform 版權所有
-    </div>
+    <UserFooter />
   </div>
 </template>
 

@@ -32,6 +32,26 @@ const routes = [
     component: () => import('../views/AnnouncementDetail.vue')
   },
   {
+    path: '/about',
+    name: 'about',
+    component: () => import('../views/About.vue')
+  },
+  {
+    path: '/cooperate',
+    name: 'cooperate',
+    component: () => import('../views/Cooperate.vue')
+  },
+  {
+    path: '/service',
+    name: 'service',
+    component: () => import('../views/Service.vue')
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: () => import('../views/Contact.vue')
+  },
+  {
     path: '/admin',
     name: 'admin login',
     component: () => import('../views/admin/Login.vue')
