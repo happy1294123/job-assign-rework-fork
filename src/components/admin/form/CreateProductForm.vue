@@ -2,7 +2,17 @@
   <div>
     <form @submit.stop.prevent="confirmForm">
       <div class="form-group">
+        <div class="flex">
         <label for="productName">商品名稱: </label>
+          <div class="flex items-center gap-2 ml-auto">
+            <label for="order">排序: </label>
+            <select name="order" class="mb-2" v-model="formDetail.order" :value="formDetail.order">
+              <option :value="order" v-for="order in orderOptionNumberList" :key="order">
+                {{ order }}
+              </option>
+            </select>
+          </div>
+        </div>
         <input
           type="text"
           class="form-control"
@@ -76,6 +86,7 @@
 </template>
 
 <script setup>
+import fetchWithToken from '@utils/fetchFn.js'
 import { reactive, onMounted } from 'vue'
 import { useToast } from 'vue-toast-notification'
 import { FadeLoader } from 'vue3-spinner'
@@ -90,6 +101,7 @@ const props = defineProps({
       status: 'fill',
       url: '',
       files: [],
+      order: 1
     })
   },
   isSubmitBtnLoading: {
@@ -98,8 +110,12 @@ const props = defineProps({
 })
 const emit = defineEmits(['confirmForm'])
 
-onMounted(() => {
+const orderOptionNumberList = ref(Array.from({ length: 16 }, (_, i) => i + 1))
+onMounted(async () => {
   Object.assign(formDetail, { ...props.productInfo })
+  const { data } = await fetchWithToken(`/api/products?filters[$and][0][order][$gt]=0&filters[$and][1][order][$ne]=${props.productInfo.order}&fields[0]=order`)
+  const orderNumberList = data.map(item => item.attributes.order)
+  orderOptionNumberList.value = orderOptionNumberList.value.filter(number => !orderNumberList.includes(number))
 })
 
 const formDetail = reactive({
@@ -108,6 +124,7 @@ const formDetail = reactive({
   status: 'fill',
   url: '',
   files: [],
+  order: 1,
 })
 const productImgPreview = ref(props.productInfo.image)
 
@@ -123,8 +140,8 @@ const previewFile = (event) => {
 }
 
 const confirmForm = () => {
-  const { name } = formDetail
-  if (!name) {
+  console.log(formDetail)
+  if (!formDetail.name) {
     console.log('商品名稱不得為空')
     $toast.error('商品名稱不得為空')
     return

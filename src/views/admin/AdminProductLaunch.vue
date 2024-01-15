@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="creatProductModal">
+  <Modal ref="createProductModal">
     <template v-slot:modalTitle>
       新增商品
     </template>
@@ -31,7 +31,7 @@
           <button
             type="button"
             class="btn btn-primary float-left mr-1"
-            @click.prevent="creatProductModal.modalOpen()"
+            @click.prevent="createProductModal.modalOpen()"
           >
             <i class="iconfont">&#xe665;</i>新增
           </button>
@@ -114,7 +114,7 @@ import { useToast } from 'vue-toast-notification'
 const $toast = useToast()
 
 const products = ref([])
-const creatProductModal = ref(null)
+const createProductModal = ref(null)
 const editProductModal = ref(null)
 const chosenProduct = reactive({
   id: 0,
@@ -127,7 +127,6 @@ const chosenProduct = reactive({
 
 const fetchProducts = async () => {
   const { data } = await fetchWithToken('/api/products?populate[image][fields]=url&sort[createdAt]=desc')
-  console.log(data)
   products.value = data.map((item) => ({
     id: item.id,
     ...item.attributes,
@@ -135,8 +134,8 @@ const fetchProducts = async () => {
 }
 
 const chooseProduct = (product) => {
-  const { id, name, isDisplay, url, image, status } = product
-  console.log(product)
+  const { id, name, isDisplay, url, image, status, order } = product
+  // console.log(product)
   Object.assign(chosenProduct, {
     id,
     name,
@@ -144,6 +143,7 @@ const chooseProduct = (product) => {
     isDisplay,
     url,
     image: image.data.attributes.url,
+    order
   })
   editProductModal.value.modalOpen()
 }
@@ -194,7 +194,7 @@ const createProduct = async (formDetail) => {
     ...data.attributes,
   })
 
-  creatProductModal.value.modalClose()
+  createProductModal.value.modalClose()
   $toast.success('新增商品成功', {
     class: 'toast-default'
   })
