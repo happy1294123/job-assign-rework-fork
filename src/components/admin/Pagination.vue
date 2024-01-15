@@ -19,6 +19,7 @@
           name="itemsCount"
           class="mx-1"
         >
+          <option value="1"> 1 </option>
           <option value="10"> 10 </option>
           <option value="20"> 20 </option>
           <option value="50"> 50 </option>

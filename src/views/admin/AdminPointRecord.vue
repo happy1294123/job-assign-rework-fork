@@ -204,9 +204,8 @@ const fetchMembers = async () => {
     queryString += '&filters[$and][4][edit_point][$lt]=0'
   }
 
-  const { data, meta } = await fetchWithToken(`/api/point-logs?populate[0]=user&populate[1]=user.group${queryString}&filters[user][isAdmin]=false&sort[createdAt]=desc`)
-  console.log(data)
-  // console.log(meta)
+  const { data, meta } = await fetchWithToken(`/api/point-logs?populate[0]=user&populate[1]=user.group${queryString}&filters[user][isAdmin]=false&sort[createdAt]=desc&pagination[page]=${pagination.page}&pagination[pageSize]=${pagination.pageSize}`)
+
   Object.assign(pagination, meta.pagination)
   pointLogs.value = data.map((item) => ({
     id: item.id,
@@ -220,6 +219,7 @@ const fetchMembers = async () => {
     cause: item.attributes.cause,
   }))
 }
+watch(() => [pagination.page, pagination.pageSize], fetchMembers)
 
 const totalPoints = computed(() => {
   let total = 0
