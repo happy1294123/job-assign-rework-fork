@@ -1,6 +1,6 @@
 <template>
   <UserLayout>
-    <div class="flex flex-col-reverse">
+    <div class="flex flex-col-reverse md:-mt-3">
       <div class="my-4 md:hidden">
         <UserSearchInput />
       </div>

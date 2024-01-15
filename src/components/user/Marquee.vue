@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[#F1F1F1] text-[#89A5EE] rounded-lg h-10 w-full md:-mb-9 overflow-hidden">
+  <div class="bg-[#F1F1F1] text-[#89A5EE] rounded-lg h-6 w-full md:-mb-9 md:-mt-4 overflow-hidden">
     <div ref="marquee" class="flex items-center px-3 h-full -mr-[150px]">
       <div v-for="an in announcementList" :key="an.id" class="cursor-pointer whitespace-nowrap"
         :style="{ marginLeft: gsapX + 'px' }" @click="() => handleRedirectAnnouncementDetail(an.id)">
