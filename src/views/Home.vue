@@ -41,6 +41,9 @@ const makeProductList = (data, optionUrl) => {
   if (optionUrl) {
     return data
   }
+  if (!data) {
+    return []
+  }
   // get empty array
   const maxInDataOrder = Math.max(...data.map(d => d.attributes.order)) 
   const maxLength = Math.max(data.length, maxInDataOrder)
